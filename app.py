@@ -28,9 +28,10 @@ remaining_channelIds = channelIds
 baseUrl = 'https://www.youtube.com'
 
 class Channel():
-    def __init__(self, name, profileUrl):
+    def __init__(self, name, profileUrl, videos):
         self.name = name
         self.profileUrl = profileUrl
+        self.videos = videos
 
     def getName(self):
         return self.name
@@ -104,11 +105,10 @@ def getChannel():
                 channel_list.append(channel)
         else:
             break
-
+    driver.quit()
     results = []
     for j in channel_list :
         results.append(j.serialize())
-    driver.quit()
     return jsonify({"channels": results})
 
 if __name__== '__main__':
