@@ -45,14 +45,14 @@ class Channel():
 channel_list = []
 
 app = Flask(__name__)
-@app.route("/bot", methods=["POST"])
+@app.route('/bot', methods=["POST"])
 def response():
     query = dict(request.form)['query']
     res = query + " " + time.ctime()
     return jsonify({"response" : res})
 
-@app.route("/fetchchannel", methods=["GET"])
-def response():
+@app.route('/fetchchannel', methods=["GET"])
+def getChannel():
     driver = webdriver.Chrome(executable_path = os.environ.get("CHROMEDRIVER_PATH"), chrome_options= op)
     for channelId in channelIds:
         if (len(channel_list) < 5):
@@ -74,5 +74,5 @@ def response():
     driver.quit()
     return jsonify({"channels": results})
 
-if __name__=="__main__":
+if __name__== '__main__':
     app.run(host="0.0.0.0",)
