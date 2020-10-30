@@ -110,8 +110,8 @@ def response():
 
     return jsonify(
         items = [
-            for channel in channel_list:
-                channel.serialize()
+            for c in channel_list:
+                c.serialize()
         ]
     )
 
