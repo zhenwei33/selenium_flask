@@ -8,7 +8,7 @@ op.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 op.add_argument("--headless")
 op.add_argument("--no-sandbox")
 op.add_argument("--disable-dev-sh-usage")
-driver = webdriver.Chrome(executable_path = os.environ.get("CHROMEDRIVER_PATH"), chrome_options= op)
+
 
 channelIds = [
     'UCSJ4gkVC6NrvII8umztf0Ow',
@@ -40,9 +40,13 @@ class Channel():
     def getVideos(self):
         return self.videos
     def serialize(self):
+        video_json = []
+        for video in self.videos:
+            video_json.append(video.serialize())
         return {
             'name': self.name,
-            'profileUrl': self.profileUrl
+            'profileUrl': self.profileUrl,
+            'videos': video_json
         }
 
 class Video:
@@ -54,6 +58,13 @@ class Video:
 
     def getTitle(self):
         return self.title
+    def serialize(self):
+        return {
+            'title': self.title,
+            'thumbnailUrl': self.thumbnailUrl,
+            'url': self.url,
+            'view': self.view
+        }
 
 channel_list = []
 
@@ -66,6 +77,7 @@ def response():
 
 @app.route("/fetchchannel", methods=["GET"])
 def response():
+    driver = webdriver.Chrome(executable_path = os.environ.get("CHROMEDRIVER_PATH"), chrome_options= op)
     for channelId in channelIds:
         if (len(channel_list) < 5):
             driver.get('{}/channel/{}'.format(baseUrl, channelId))
@@ -108,12 +120,11 @@ def response():
         else:
             break
 
-    return jsonify(
-        items = [
-            for c in channel_list:
-                c.serialize()
-        ]
-    )
+    results = []
+    for j in channel_list :
+        results.append(j.serialize())
+    driver.quit()
+    return jsonify({"channels": results})
 
 if __name__=="__main__":
     app.run(host="0.0.0.0",)
