@@ -9,13 +9,11 @@ op.add_argument("--headless")
 op.add_argument("--no-sandbox")
 op.add_argument("--disable-dev-sh-usage")
 
-
 channelIds = [
     'UCSJ4gkVC6NrvII8umztf0Ow',
     'UCzMxEa-lDX2AfgotszScOFg',
     'UCsIg9WMfxjZZvwROleiVsQg',
     # 'UChs0pSaEoNLV4mevBFGaoKA'
-
     'UC1opHUrw8rvnsadT-iGp7Cg', #aqua
     'UC-hM6YJuNYVAmUWxeIr9FeA', # miko
     'UC1DCedRgGHBdm81E1llLhOQ', # pekora
@@ -30,40 +28,18 @@ remaining_channelIds = channelIds
 baseUrl = 'https://www.youtube.com'
 
 class Channel():
-    def __init__(self, name, profileUrl, videos):
+    def __init__(self, name, profileUrl):
         self.name = name
         self.profileUrl = profileUrl
-        self.videos = videos
 
     def getName(self):
         return self.name
     def getVideos(self):
         return self.videos
     def serialize(self):
-        video_json = []
-        for video in self.videos:
-            video_json.append(video.serialize())
         return {
             'name': self.name,
             'profileUrl': self.profileUrl,
-            'videos': video_json
-        }
-
-class Video:
-    def __init__(self, title, thumbnailUrl, url, view):
-        self.title = title
-        self.thumbnailUrl = thumbnailUrl
-        self.url = url
-        self.view = view
-
-    def getTitle(self):
-        return self.title
-    def serialize(self):
-        return {
-            'title': self.title,
-            'thumbnailUrl': self.thumbnailUrl,
-            'url': self.url,
-            'view': self.view
         }
 
 channel_list = []
@@ -85,38 +61,10 @@ def response():
             # Channel details
             name = driver.find_element_by_xpath('//*[@id="text-container"]/yt-formatted-string').text
             profileUrl = driver.find_element_by_xpath('//*[@id="avatar"]/img').get_attribute('src')
-            video_list = []
-            is_live = 0
-            # Video details
-            titles = driver.find_elements_by_xpath('//*[@id="video-title"]/yt-formatted-string')
-            thumbnailUrls = driver.find_elements_by_xpath('//*[@id="thumbnail"]/yt-img-shadow/img')
-            urls = driver.find_elements_by_xpath('//*[@id="thumbnail"]')
-            views = driver.find_elements_by_xpath('//*[@id="metadata-line"]')
-            
-            # print(name)
-            # print(profileUrl)
-            # print(len(titles))
-            for i in range(len(titles)):
-                view = views[i].text
-                if (view.split()[1] == 'watching'): # else 'waiting'
-                    title = titles[i].text
-                    thumbnailUrl = thumbnailUrls[i].get_attribute('src')
-                    url = urls[i].get_attribute('href')
-                    is_live = is_live + 1
-                    
-                    # print(title) # title
-                    # print(thumbnailUrl) # thumbnailUrl
-                    # print(url) # url
-                    # print(view) # view
 
-                    video = Video(title, thumbnailUrl, url, view)
-                    video_list.append(video)
-            
-            if (is_live > 0):
-                channel = Channel(name, profileUrl, video_list)
-                channel_list.append(channel)
-                # channel_live += 1
-                print(channel.getName())
+            channel = Channel(name, profileUrl)
+            channel_list.append(channel)
+            print(channel.getName())
         else:
             break
 
